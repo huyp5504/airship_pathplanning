@@ -1,73 +1,73 @@
-# 飞艇路径规划系统 (Airship Path Planning System)
+# Airship Path Planning System
 
-基于强化学习的飞艇路径规划系统，结合风场数据同化技术，实现了在复杂风场环境下的智能路径规划。
+A reinforcement learning-based airship path planning system that integrates wind field data assimilation technology to achieve intelligent path planning in complex wind field environments.
 
-## 项目结构
+## Project Structure
 
 ```
 airship_pathplanning/
-├── model.py           # 定义强化学习模型的特征提取器
-├── Gauss.py           # 风场数据同化模块，基于高斯模型
-├── train.py           # 模型训练和测试的主程序
-├── conv_ppo.py        # 基于PPO算法的卷积神经网络路径规划实现
-├── myenv_conv.py      # 路径规划环境(基础版)
-└── myenv_conv_energy.py # 考虑能量消耗的路径规划环境
+├── model.py           # Defines the feature extractor for the reinforcement learning model
+├── Gauss.py           # Wind field data assimilation module based on Gaussian model
+├── train.py           # Main program for model training and testing
+├── conv_ppo.py        # Convolutional neural network-based path planning implementation using PPO algorithm
+├── myenv_conv.py      # Path planning environment (basic version)
+└── myenv_conv_energy.py # Path planning environment considering energy consumption
 ```
 
-## 核心功能
+## Core Features
 
-1. **风场数据同化**：基于高斯模型融合预报风场与实时测量数据，提高风场预测精度
-2. **深度强化学习**：使用PPO(Proximal Policy Optimization)算法训练路径规划模型
-3. **多输入特征提取**：结合CNN(卷积神经网络)处理网格风场数据和向量特征
-4. **路径可视化**：直观展示飞艇规划路径与风场环境的关系
+1. **Wind Field Data Assimilation**: Fuses forecast wind field data with real-time measurement data based on a Gaussian model to improve wind field prediction accuracy
+2. **Deep Reinforcement Learning**: Trains the path planning model using the PPO (Proximal Policy Optimization) algorithm
+3. **Multi-Input Feature Extraction**: Combines CNN (Convolutional Neural Network) to process grid-based wind field data and vector features
+4. **Path Visualization**: Intuitively displays the relationship between the planned airship path and the wind field environment
 
-## 关键模块说明
+## Key Module Explanations
 
-### 1. 风场数据同化 (Gauss.py)
+### 1. Wind Field Data Assimilation (Gauss.py)
 
-实现了`WindFieldAssimilation`类，主要功能包括：
-- 从NetCDF文件加载风场预报数据
-- 提取以飞艇位置为中心的局部风场矩阵
-- 使用高斯影响函数融合测量值与预报值
-- 计算并可视化风场不确定性
+Implements the `WindFieldAssimilation` class with core functionalities:
+- Loads wind field forecast data from NetCDF files
+- Extracts local wind field matrices centered at the airship's position
+- Fuses measured values with forecast values using a Gaussian influence function
+- Calculates and visualizes wind field uncertainty
 
 ```python
-# 示例用法
+# Example Usage
 assimilation = WindFieldAssimilation(window_size=32, f_path='wind_data.nc')
-assimilation.update([88, 125], 0.5, 0.1)  # 更新风场
+assimilation.update([88, 125], 0.5, 0.1)  # Update wind field
 ```
 
-### 2. 特征提取器 (model.py)
+### 2. Feature Extractor (model.py)
 
-`CustomCombinedExtractor`类实现了多模态特征融合：
-- 使用CNN处理风场矩阵数据
-- 结合向量特征(如位置、速度等)
-- 通过全连接层输出融合特征
+The `CustomCombinedExtractor` class enables multi-modal feature fusion:
+- Processes grid-based wind field data using CNN
+- Integrates vector features (e.g., position, velocity, etc.)
+- Outputs fused features through fully connected layers
 
-### 3. 模型训练与测试 (train.py & conv_ppo.py)
+### 3. Model Training & Testing (train.py & conv_ppo.py)
 
-提供了完整的模型训练和测试流程：
-- `train_and_save()`: 训练PPO模型并保存
-- `runwithplot()`: 加载模型并可视化路径规划结果
-- `run()`: 执行路径规划并返回轨迹数据
+Provides a complete workflow for model training and testing:
+- `train_and_save()`: Trains the PPO model and saves the checkpoint
+- `runwithplot()`: Loads the trained model and visualizes path planning results
+- `run()`: Executes path planning and returns trajectory data
 
-## 使用方法
+## Usage Instructions
 
-### 训练模型
+### Train the Model
 
 ```python
-# 训练考虑能量消耗的模型
+# Train model considering energy consumption
 train_and_save(PathPlanningEnv_energy, 32, "model/PPO_energyenv_conv32_500w", 5000000)
 ```
 
-### 测试模型并可视化
+### Test the Model & Visualize Results
 
 ```python
-# 测试模型并显示路径
+# Test model and display planned path
 runwithplot("model/PPO_energyenv_conv32_500w", PathPlanningEnv_energy, 32)
 ```
 
-## 依赖项
+## Dependencies
 
 - Python 3.x
 - PyTorch
@@ -76,10 +76,10 @@ runwithplot("model/PPO_energyenv_conv32_500w", PathPlanningEnv_energy, 32)
 - Matplotlib
 - NetCDF4
 
-## 备注
+## Notes
 
-- 风场数据需以NetCDF格式提供，包含'u'和'v'变量
-- 可通过调整`policy_kwargs`参数修改神经网络结构
-- 环境大小(conv_size)可根据实际需求调整，默认32x32网格
+- Wind field data must be provided in NetCDF format, containing 'u' (zonal wind) and 'v' (meridional wind) variables
+- The neural network structure can be modified by adjusting the `policy_kwargs` parameter
+- The environment size (conv_size) can be adjusted according to actual requirements (default: 32x32 grid)
 
-该系统可应用于飞艇、无人机等在大气环境中运行的飞行器路径规划，通过考虑风场影响提高路径规划的效率和准确性。
+This system can be applied to path planning of airships, UAVs, and other aerial vehicles operating in atmospheric environments. By considering wind field effects, it improves the efficiency and accuracy of path planning.
