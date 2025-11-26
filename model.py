@@ -43,7 +43,7 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
     def _get_flattened_size(self):
         # Forward pass to calculate the size of the flattened CNN output
         with th.no_grad():
-            dummy_input = th.zeros( 1, *self.matrix_shape)  # 确保通道数为 1
+            dummy_input = th.zeros( 1, *self.matrix_shape)  # ensure number of channels is 1
             n_flatten = self.cnn(dummy_input).shape[1]
         return n_flatten
 
