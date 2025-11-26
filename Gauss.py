@@ -27,20 +27,20 @@
 #         self.wind_v=self.extract_submatrix(self.dataset.variables['v'][6][0][0]/10, [x,y])
 #     def extract_submatrix(self,field, center):
 
-#         # 获取给定中心位置
+#         # get the given center position
 #         i, j = center
 #         # print(center)
 #         # print(field)
-#         # 32x32 矩阵半边的大小
+#         # half-size of the 32x32 matrix
 #         half_size = self.window_size/2
         
-#         # 初始化一个 32x32 的零矩阵
+#         # initialize a 32x32 zero matrix
 #         submatrix = np.zeros((self.window_size, self.window_size))
         
 
 #         for i in range(self.window_size):
 #             for j in range(self.window_size):
-#                 # 计算当前位置在给定中心位置的偏移量
+#                 # compute offset from the given center position
 #                 # print(i + center[0] - half_size, j + center[1] - half_size)
 #                 try:
 #                     submatrix[i, j] = field[int(i + center[0] - half_size), int(j + center[1] - half_size)]
@@ -53,58 +53,58 @@
     
 #     def fuse_wind_field(self,postion,measured_u,measured_v, sigma=5):
 #         """
-#         将空艇中心的准确风测量值与预报风场融合。
+#         Fuse accurate wind measurements at the airship center with the forecast wind field.
 
-#         参数：
-#         - wind_f: 2D numpy数组,形状为(32, 32),预报风场。
-#         - W_m: float,空艇当前位置的测量风速。
-#         - center_x, center_y: int,数组中的中心坐标（应该是16, 16,表示中心）。
-#         - sigma: float,控制影响范围的参数。
+#         Parameters:
+#         - wind_f: 2D numpy array (32x32), forecast wind field.
+#         - W_m: float, measured wind speed at the airship position.
+#         - center_x, center_y: int, center indices in array (16, 16).
+#         - sigma: float, controls the influence range.
 
-#         返回值：
-#         - wind_u: 2D numpy数组,更新后的风场。
-#         - uncertainty: 2D numpy数组,每个位置的不确定性。
+#         Returns:
+#         - wind_u: 2D numpy array, updated wind field.
+#         - uncertainty: 2D numpy array, per-cell uncertainty.
 #         """
 #         center_x, center_y = [16,16]
 #         # 初始化数组
         
         
-#         # 中心的测量值和预报值之间的差异
+#         # difference between measured and forecast values at center
 #         E_u_center = self.wind_u[center_x, center_y]
 #         E_v_center = self.wind_v[center_x, center_y]
 #         delta_u = E_u_center - measured_u
 #         delta_v = E_v_center - measured_v
 #         error = np.sqrt(delta_u**2+delta_v**2)
-#         # 基础不确定性
-#         U_base = 0.2  # 基础不确定性,根据需要调整
-#         U_delta = 1.0  # 基于delta的不确定性缩放因子,根据需要调整
+#         # base uncertainty
+#         U_base = 0.2  # base uncertainty, adjust as needed
+#         U_delta = 1.0  # uncertainty scale factor based on delta, adjust as needed
 
-#         # 创建坐标网格
+#         # create coordinate grid
 #         x = np.arange(self.window_size)
 #         y = np.arange(self.window_size)
 #         X, Y = np.meshgrid(x, y, indexing='ij')
 
-#     # 计算距离中心的距离
+#     # compute distance from center
 #         D = np.sqrt((X - center_x)**2 + (Y - center_y)**2)*(1/error)*0.2
 
 #         #
-#     #计算影响函数
+#     # compute influence function
 #         I = np.exp(-D**2 / (2 * sigma**2))
 
-#         # 更新风场
+#         # update wind field
 #         self.wind_u = self.wind_u - delta_u * I
 #         self.wind_v = self.wind_v - delta_v * I
 
-#         # 计算不确定性
+#         # compute uncertainty
 #         self.uncertainty = U_base + U_delta * np.abs(error) * (1 - I)
 
 
         
 
-#     # 此示例中,我们假设提取当前时间步的数据
+#     # In this example, we assume extracting the current timestep data
 #     def update(self, position, measured_u, measured_v):
 #         """
-#         根据测量值更新风场。
+#         Update wind field based on measurements.
 #         """
 #         self.load_forecast(position)
         
@@ -149,8 +149,8 @@
 #     # assimilation.update([44,111],0.5,0)
 #     assimilation.update([88,125],0.5,0.1)
 
-# # 更新后的风场（wind_u）和不确定性图（uncertainty）现在可用
-# # 它们可以用于进一步处理强化学习算法
+# # The updated wind field (wind_u) and uncertainty map (uncertainty) are now available
+# # They can be used for further processing in reinforcement learning algorithms
 import numpy as np
 import netCDF4 as nc
 import matplotlib.pyplot as plt
@@ -178,17 +178,17 @@ class WindFieldAssimilation:
         self.wind_v = self.extract_submatrix(self.dataset.variables['v'][6][0][0] / 10, [x, y])
 
     def extract_submatrix(self, field, center):
-        # 获取给定中心位置
+        # get the given center position
         i, j = center
-        # 32x32 矩阵半边的大小
+        # half-size of the 32x32 matrix
         half_size = self.window_size / 2
 
-        # 初始化一个 32x32 的零矩阵
+        # initialize a 32x32 zero matrix
         submatrix = np.zeros((self.window_size, self.window_size))
 
         for i in range(self.window_size):
             for j in range(self.window_size):
-                # 计算当前位置在给定中心位置的偏移量
+                # compute offset from the given center position
                 try:
                     submatrix[i, j] = field[int(i + center[0] - half_size), int(j + center[1] - half_size)]
                 except:
@@ -197,42 +197,42 @@ class WindFieldAssimilation:
 
     def fuse_wind_field(self, postion, measured_u, measured_v, sigma=5):
         """
-        将空艇中心的准确风测量值与预报风场融合。
+        Fuse accurate wind measurements at the airship center with the forecast wind field.
         """
         center_x, center_y = [16, 16]
-        # 中心的测量值和预报值之间的差异
+        # difference between measured and forecast values at center
         E_u_center = self.wind_u[center_x, center_y]
         E_v_center = self.wind_v[center_x, center_y]
         delta_u = E_u_center - measured_u
         delta_v = E_v_center - measured_v
         error = np.sqrt(delta_u**2 + delta_v**2)
-        # 基础不确定性
-        U_base = 0.2  # 基础不确定性,根据需要调整
-        U_delta = 1.0  # 基于delta的不确定性缩放因子,根据需要调整
+        # base uncertainty
+        U_base = 0.2  # base uncertainty, adjust as needed
+        U_delta = 1.0  # uncertainty scale factor based on delta, adjust as needed
 
-        # 创建坐标网格
+        # create coordinate grid
         x = np.arange(self.window_size)
         y = np.arange(self.window_size)
         X, Y = np.meshgrid(x, y, indexing='ij')
 
-        # 计算距离中心的距离
+        # compute distance from center
         D = np.sqrt((X - center_x)**2 + (Y - center_y)**2) * (1 / error) * 0.2
 
-        # 计算影响函数
+        # compute influence function
         I = np.exp(-D**2 / (2 * sigma**2))
 
-        # 更新风场
+        # update wind field
         self.wind_u = self.wind_u - delta_u * I
         self.wind_v = self.wind_v - delta_v * I
 
-        # 计算不确定性
+        # compute uncertainty
         self.uncertainty = U_base + U_delta * np.abs(error) * (1 - I)
 
     def update(self, position, measured_u, measured_v, save_dir="output_images"):
         """
-        根据测量值更新风场，并将图像保存到指定目录。
+        Update wind field based on measurements and save images to the specified directory.
         """
-        # 创建保存目录（如果不存在）
+        # create output directory if it does not exist
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
 
@@ -247,7 +247,7 @@ class WindFieldAssimilation:
         plt.quiver(x, y, u * 3, v * 3, speed, cmap='jet', scale=50)
         plt.gca().set_aspect('equal')
         
-        # 添加标题到图片下方
+        # add caption below the image
         plt.text(0.5, -0.1, "(a) Initial Wind", transform=plt.gca().transAxes, 
                  fontsize=12, ha='center', va='center')
         
@@ -265,7 +265,7 @@ class WindFieldAssimilation:
         plt.quiver(x, y, u * 3, v * 3, 1 - self.uncertainty[::2, ::2], cmap='jet', scale=50)
         plt.gca().set_aspect('equal')
         
-        # 添加标题到图片下方
+        # add caption below the image
         plt.text(0.5, -0.1, "(b) Updated Wind", transform=plt.gca().transAxes, 
                  fontsize=12, ha='center', va='center')
         
@@ -278,7 +278,7 @@ class WindFieldAssimilation:
         plt.gca().set_aspect('equal')
         plt.colorbar(fraction=0.046, pad=0.04)
         
-        # 添加标题到图片下方
+        # add caption below the image
         plt.text(0.5, -0.1, "(c) Uncertainty After Assimilation", transform=plt.gca().transAxes, 
                  fontsize=12, ha='center', va='center')
         
