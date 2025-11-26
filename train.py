@@ -49,7 +49,7 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
     def _get_flattened_size(self):
         # Forward pass to calculate the size of the flattened CNN output
         with th.no_grad():
-            dummy_input = th.zeros(1, *self.matrix_shape)  # 确保通道数为 1
+            dummy_input = th.zeros(1, *self.matrix_shape)  # ensure number of channels is 1
             n_flatten = self.cnn(dummy_input).shape[1]
         return n_flatten
 
@@ -108,8 +108,8 @@ def runwithplot(modelpath,pathplanning_env,env_conv_size,config=[0,0,0,0]):
     plot = np.zeros((2, env.max_steps))
     for i in range(env.max_steps):
         action, _state = model.predict(obs, deterministic=True)
-        plot[0, i] = obs['vector'][0]  # 记录 x 坐标
-        plot[1, i] = obs['vector'][1]  # 记录 y 坐标
+        plot[0, i] = obs['vector'][0]  # record x coordinate
+        plot[1, i] = obs['vector'][1]  # record y coordinate
         print(i, action, obs['vector'][4:6])
         obs, reward, done, info = env.step(action)
         r += reward
@@ -120,8 +120,8 @@ def runwithplot(modelpath,pathplanning_env,env_conv_size,config=[0,0,0,0]):
     plt.xlim(0, MAX_L)
     plt.ylim(0, MAX_L)
     for i in range(len(plot[0])):
-        plot[0, i] = env.end_x - plot[0, i]  # 记录 x 坐标
-        plot[1, i] = env.end_y - plot[1, i]  # 记录 y 坐标
+        plot[0, i] = env.end_x - plot[0, i]  # record x coordinate
+        plot[1, i] = env.end_y - plot[1, i]  # record y coordinate
 
     for k in range(10):
         U = env.dataset.variables['u'][k][0][0]
@@ -132,14 +132,14 @@ def runwithplot(modelpath,pathplanning_env,env_conv_size,config=[0,0,0,0]):
                     plt.arrow(i, j, U[i, j] / 2 if U[i, j] > 2 else U[i, j], V[i, j] / 2 if V[i, j] > 3 else V[i, j],
                             head_width=0.1, head_length=0.2, fc='white', ec='black')
 
-    plt.plot(plot[0], plot[1], color='red', label='USV 0')  # 绘制路径
-    goal = plt.Circle((env.end_x, env.end_y), 1, color='green', fill=False)  # 绘制终点
+    plt.plot(plot[0], plot[1], color='red', label='USV 0')  # plot path
+    goal = plt.Circle((env.end_x, env.end_y), 1, color='green', fill=False)  # plot goal
     start = plt.Circle((env.start_x, env.start_y), 0.1, color='blue', fill=False)
     plt.gca().add_patch(goal)
     plt.gca().add_patch(start)
-    plt.axis('equal')  # 保持坐标轴比例
+    plt.axis('equal')  # keep axis aspect ratio
     print(r)
-    plt.show()  # 显示图像
+    plt.show()  # show image
     
 def run(modelpath,pathplanning_env,env_conv_size,config=[0,0,0,0]):
     startx,starty,endx,endy=config
@@ -151,8 +151,8 @@ def run(modelpath,pathplanning_env,env_conv_size,config=[0,0,0,0]):
     plot = np.zeros((2, env.max_steps))
     for i in range(env.max_steps):
         action, _state = model.predict(obs, deterministic=True)
-        plot[0, i] = obs['vector'][0]  # 记录 x 坐标
-        plot[1, i] = obs['vector'][1]  # 记录 y 坐标
+        plot[0, i] = obs['vector'][0]  # record x coordinate
+        plot[1, i] = obs['vector'][1]  # record y coordinate
         # print(i, action, obs['vector'][:4])
         obs, reward, done, info = env.step(action)
         r += reward
@@ -161,8 +161,8 @@ def run(modelpath,pathplanning_env,env_conv_size,config=[0,0,0,0]):
             print(modelpath+"done after "+str(i)+" steps")
             break
     for i in range(len(plot[0])):
-        plot[0, i] = env.end_x - plot[0, i]  # 记录 x 坐标
-        plot[1, i] = env.end_y - plot[1, i]  # 记录 y 坐标
+        plot[0, i] = env.end_x - plot[0, i]  # record x coordinate
+        plot[1, i] = env.end_y - plot[1, i]  # record y coordinate
     return plot
 
 if __name__ == '__main__':
